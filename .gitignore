@@ -1,3 +1,8 @@
+#other folders
+*.vcxproj
+*.vcxproj.filters
+*.sln
+
 # Prerequisites
 *.d
 
