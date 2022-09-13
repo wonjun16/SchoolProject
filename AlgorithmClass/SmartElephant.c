@@ -50,29 +50,27 @@ void LCS(int WSI[][3], int count) { //longest common subsequence algorithm
 	}
 }
 
-void result(int count) {
-	int result[SIZE], index=memo[count-1][count-1], check=0;
+void result(int count) { //show result
+	int result[SIZE] = { 0 }, index = 0, check = 0, subJ=0;
 	for (int i = count - 1; i > 0; i--) {
-		for (int j = i; j > 0; j--) {
-			if (check) {
-				check = 0;
-				continue;
-			}
+		for (int j = count-1-subJ; j > 0; j--) {
 			if (memo[i][j] == memo[i - 1][j]) {
 				break;
 			}
 			else if (memo[i][j] == memo[i][j - 1]) {
+				subJ++;
 				continue;
 			}
 			else {
 				result[index] = sortedS[i];
-				index--;
+				index++;
+				subJ++;
 				check = 1;
 				break;
 			}
 		}
 	}
-	for (int i = 0; i < count; i++) {
+	for (int i = memo[count-1][count-1]-1; i >= 0; i--) {
 		printf("%d", result[i]);
 	}
 }
@@ -89,14 +87,4 @@ void main() {
 	LCS(weightSmartIndex, count - 1);
 	printf("%d\n", memo[count - 2][count - 2]);
 	result(count - 1);
-	printf("\n");
-	for (int i = 1; i < count - 1; i++) {
-		for (int j = 1; j < count - 1; j++) {
-			printf("%d ", memo[i][j]);
-		}
-		printf("\n");
-	}
-	for (int i = 1; i < count - 1; i++) {
-		printf("%d ", sortedS[i]);
-	}
 }
