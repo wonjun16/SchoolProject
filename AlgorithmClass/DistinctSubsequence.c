@@ -11,18 +11,12 @@ int distinctSubsequence(char oWord[], char fWord[]) {
 	for (int i = 1; i < fLength+1; i++) {
 		for (int j = 1; j < oLength+1; j++) {
 			if (oWord[j - 1] == fWord[i - 1] && i == 1)
-				memo[i][j]++;
+				memo[i][j] = memo[i][j - 1] + 1;
 			else if (oWord[j - 1] == fWord[i - 1])
-				memo[i][j] = memo[i - 1][j] + memo[i][j - 1];
+				memo[i][j] = memo[i - 1][j - 1] + memo[i][j - 1];
 			else
 				memo[i][j] = memo[i][j - 1];
 		}
-	}
-	for (int i = 1; i < fLength + 1; i++) {
-		for (int j = 1; j < oLength + 1; j++) {
-			printf("%d", memo[i][j]);
-		}
-		printf("\n");
 	}
 	return memo[fLength][oLength];
 }
