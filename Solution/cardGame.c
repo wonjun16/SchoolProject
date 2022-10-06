@@ -17,11 +17,12 @@ typedef struct computer {
 	int cardNumber;
 }COMPUTER;
 
-CARD cardDeck[48];
-USER userPick[5];
+CARD cardDeck[48]; //spade 1~12, diamond 1~12, clover 1~12, hart 1~12
+USER userPick[5]; //pick five card each for random
 COMPUTER computerPick[5];
 
-void initailzeCardDeck() {
+void initializeCardDeck() {
+	srand(time(NULL));
 	for (int i = 0; i < 12; i++) {
 		for (int j = 0; j < 4; j++) {
 			switch (j)
@@ -48,17 +49,13 @@ void initailzeCardDeck() {
 }
 
 void userPickForRamdom() {
-	for (int i = 0; i < 5; i++) {
-		srand(time(NULL));
+	for (int i = 0; i < 5; i++)
 		userPick[i].cardNumber = rand() % 48 + 1;
-	}
 }
 
 void computerPickForRamdom() {
-	for (int i = 0; i < 5; i++) {
-		srand(time(NULL));
+	for (int i = 0; i < 5; i++)
 		computerPick[i].cardNumber = rand() % 48 + 1;
-	}
 }
 
 int findUserTotal() {
@@ -111,19 +108,24 @@ void ComputerVsUser(int userTotal, int computerTotal, char userShape[], char com
 	else if (computerTotal > userTotal)
 		printf("COMPUTER WIN!!!!!\n");
 	else {
-
+		if (!strcmp(userShape, computerShape))
+			printf("DRAW!!!!!\n");
+		else if (strcmp(userShape, computerShape) > 0)
+			printf("USER WIN!!!!!\n");
+		else
+			printf("COMPUTER WIN!!!!!\n");
 	}
 }
 
 void main() {
 	int userTotal, computerTotal;
 	char userShape[20], computerShape[20];
-	initailzeCardDeck();
+	initializeCardDeck();
 	userPickForRamdom();
 	computerPickForRamdom();
 	userTotal = findUserTotal();
 	computerTotal = findComputerTotal();
 	strcpy(userShape, findUserShape());
-	strcpy(computerTotal, findComputerShape());
-
+	strcpy(computerShape, findComputerShape());
+	ComputerVsUser(userTotal, computerTotal, userShape, computerShape);
 }
