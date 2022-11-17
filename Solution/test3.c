@@ -71,10 +71,91 @@ void appendNode(NODE** head, int data) {
 	ptr->next = node;
 }
 
-//void deleteNode()
+void deleteNode(NODE **head, int data) {
+	NODE* old_ptr=NULL, *ptr=*head;
+	while (ptr) {
+		if (ptr->key==data && ptr==*head) {
+			*head = ptr->next;
+			free(ptr);
+			break;
+		}
+		if (ptr->key == data) {
+			old_ptr->next = ptr->next;
+			free(ptr);
+			break;
+		}
+		old_ptr = ptr;
+		ptr = ptr->next;
+	}
+	if (!ptr) {
+		printf("해당 값을 찾지 못했습니다.\n");
+	}
+}
+
+void removeTail(NODE** head)
+
+{
+
+	NODE* curPtr = *head;
+
+	NODE* prevPtr = NULL;
+
+	// special case for length 0
+
+	if (curPtr == NULL) {
+
+		return;
+
+	}
+
+	while (curPtr->next != NULL) {
+
+		prevPtr = curPtr;
+
+		curPtr = curPtr->next;
+
+	}
+
+	// at this point, ptr is referring the tail node
+
+	// two cases: length = 1,  length > 1
+
+	if (*head == curPtr) {
+
+		free(curPtr);
+
+		*head = NULL;
+
+	}
+
+	else {
+
+		free(curPtr);
+
+		prevPtr->next = NULL;
+
+	}
+
+}
+
+void removeALL(NODE** head) {
+	NODE* old_ptr = *head , * ptr = (*head)->next;
+	while (ptr) {
+		free(old_ptr);
+		old_ptr = ptr;
+		ptr = ptr->next;
+	}
+	*head = NULL;
+	printf("정상적으로 해제되었습니다.\n");
+}
 
 void insertNode(NODE** head, int data) {
 	NODE* node = createNode(data), * old_ptr=NULL, * ptr = *head;
+	if (ptr->key > data) {
+		node->next = ptr;
+		*head = node;
+		return;
+	}
 	while (ptr->next) {
 		if (ptr->key == data) {
 			printf("data is already exist.\n");
@@ -85,6 +166,11 @@ void insertNode(NODE** head, int data) {
 			ptr = ptr->next;
 		}
 		else {
+			/*if (ptr == *head) {
+				node->next = *head;
+				*head = node;
+				break;
+			}*/
 			old_ptr->next = node;
 			node->next = ptr;
 			break;
@@ -104,7 +190,7 @@ void main() {
 	node1->next = node2;
 	node2->next = node3;
 
-	displayList(head);
+	/*displayList(head);
 
 	length = lengthTest(head);
 	printf("Length of Linked List : %d\n", length);
@@ -117,12 +203,17 @@ void main() {
 
 	appendNode(&head, 400);
 
-	displayList(head);
+	displayList(head);*/
 
+	insertNode(&head, 5);
 	insertNode(&head, 250);
 	insertNode(&head, 1000);
 
+	deleteNode(&head, 200);
+
 	displayList(head);
 
-	free(head);
+	removeALL(&head);
+
+	displayList(head);
 }
