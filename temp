@@ -1,0 +1,1481 @@
+//dia
+
+
+import java.sql.*;
+import java.awt.EventQueue;
+import java.awt.Color;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JLabel;
+import java.awt.Font;
+import javax.swing.JTextField;
+import javax.swing.JTextArea;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.awt.event.ActionEvent;
+import java.time.LocalDate;
+import javax.swing.JOptionPane;
+
+public class dia {
+
+	public JFrame diaFrame;
+	public JTextField titleTextArea;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the application.
+	 */
+	public dia(String myId) {
+		initialize(myId);
+	}
+
+	/**
+	 * Initialize the contents of the frame.
+	 */
+	private void initialize(String myId) {
+		diaFrame = new JFrame();
+		diaFrame.setTitle("Update POST");
+		diaFrame.setBounds(300, 300, 450, 300);
+		diaFrame.getContentPane().setLayout(null);
+		
+		JPanel panel = new JPanel();
+		panel.setBounds(0, 0, 434, 261);
+		diaFrame.getContentPane().add(panel);
+		panel.setLayout(null);
+		
+		// title�쓣 寃뚯떆�븷 遺�遺�
+		JLabel titleLabel = new JLabel("Title:");
+		titleLabel.setForeground(Color.DARK_GRAY);
+		titleLabel.setFont(new Font("Comic Sans MS", Font.BOLD | Font.ITALIC, 14));
+		titleLabel.setBounds(23, 27, 57, 15);
+		panel.add(titleLabel);
+		
+		titleTextArea = new JTextField();
+		titleTextArea.setBounds(96, 26, 294, 21);
+		panel.add(titleTextArea);
+		titleTextArea.setColumns(10);
+		
+		// content瑜� 寃뚯떆�븷 遺�遺�
+		JLabel contentLabel = new JLabel("Content:");
+		contentLabel.setForeground(Color.DARK_GRAY);
+		contentLabel.setFont(new Font("Comic Sans MS", Font.BOLD | Font.ITALIC, 14));
+		contentLabel.setBounds(23, 68, 70, 15);
+		panel.add(contentLabel);
+		
+		JTextArea contentTextArea = new JTextArea();
+		contentTextArea.setBounds(96, 65, 294, 141);
+		panel.add(contentTextArea);
+		
+		// update 踰꾪듉 �씠踰ㅽ듃 遺�遺�
+		// update 踰꾪듉�쓣 �늻瑜대㈃ �셿猷뚮릺�뿀�떎�뒗 �뙘�뾽李쎄낵 �븿猿� db�뿉 ���옣�맖
+		// main�뿉�꽌 �궡 id瑜� ���옣�븷 �닔 �엳�뒗 �슂�냼�옉 媛숈씠 �빀爾먯빞�븷 寃� 媛숈쓬
+		// title怨� content�뒗 ���옣�릺吏�留� �늻媛� post�뻽�뒗吏� 紐⑤Ⅴ湲곕븣臾몄뿉..
+		RoundedButton updateButton = new RoundedButton("Update");
+		updateButton.setForeground(Color.WHITE);
+		updateButton.setBackground(new Color(30, 144, 255));
+		updateButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// �씠 �븘�씠�뵒�뒗 �궡媛� 吏��젙�빐以� 寃�. login -> main�쑝濡� 媛덈븣 id �젙蹂대�� 媛��졇���빞�븿..
+				// �쁽�옱 �떆媛�(post�븳)
+				LocalDate now = LocalDate.now();
+				
+				// DB connection
+				DBConnection DBcon = new DBConnection();
+				DBcon.connect();
+				String title = titleTextArea.getText();
+				String content = contentTextArea.getText();
+				
+				String query = String.format("insert into post values('%s', 0, null, '%s', '%s', '%s');", myId, content, title, now);
+				try {
+					Statement stmt = DBcon.connection.createStatement();
+					stmt.executeUpdate(query);
+					DBcon.connection.close();
+					// �뙘�뾽李� �굹�삤�뒗 遺�遺�
+					JOptionPane.showMessageDialog(diaFrame, "�뾽�뜲�씠�듃 �릺�뿀�뒿�땲�떎!");
+					diaFrame.setVisible(false);
+					
+				}catch(SQLException SQLE){
+					SQLE.printStackTrace();
+				}
+				
+			}
+		});
+		updateButton.setFont(new Font("Comic Sans MS", Font.BOLD | Font.ITALIC, 13));
+		updateButton.setBounds(325, 228, 97, 23);
+		panel.add(updateButton);
+	}
+
+}
+
+//Login
+
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+import javax.swing.ImageIcon;
+
+public class LoginProject {
+
+	static JFrame jf;
+	JPanel cardPanel;
+	LoginProject lp;
+	CardLayout card;
+
+	public static void main(String[] args) {
+
+		LoginProject lp = new LoginProject();
+		lp.setFrame(lp);
+
+	}
+
+	public void setFrame(LoginProject lpro) {
+
+		jf = new JFrame();
+		LoginPanel lp = new LoginPanel(lpro);
+		signupPanel sp = new signupPanel(lpro);
+		ChangepasswordPanel MI = new ChangepasswordPanel(lpro);
+		
+		card = new CardLayout();
+
+		cardPanel = new JPanel(card);
+		cardPanel.add(lp.mainPanel, "Login"); // 留⑥븵
+		cardPanel.add(sp.mainPanel, "SignUp"); // �쉶�썝媛��엯
+		cardPanel.add(MI.mainPanel, "Change Password"); // 留⑤뮘
+		
+		jf.add(cardPanel);
+		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		jf.setSize(500, 700);
+		jf.setVisible(true);
+	}
+
+	public Connection getConnection() throws SQLException {
+		Connection conn = null;
+
+		conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/twitter","twitter","gachon"); 
+		// mysql location �뀒�뒪�듃�븷 �븣, �옄湲� db�씠由꾩쑝濡� �닔�젙�븷 寃�.
+
+		return conn;
+	}
+
+}
+
+class LoginPanel extends JPanel implements ActionListener {
+
+	JPanel mainPanel;
+	JTextField idTextField;
+	JPasswordField passTextField;
+	
+	String userMode = "normal";
+	LoginProject lp;
+	Font font = new Font("SignUp", Font.BOLD, 40);
+
+	public LoginPanel(LoginProject lp) {
+		this.lp = lp;
+		
+		mainPanel = new JPanel();
+		mainPanel.setLayout(new GridLayout(5, 1));
+		
+		JPanel centerPanel = new JPanel();
+		JLabel loginLabel = new JLabel("Log in To Twitter");
+		centerPanel.setBackground(new Color(255,255,255,255));
+		
+		loginLabel.setFont(font);
+		centerPanel.add(loginLabel);
+
+		JPanel userPanel = new JPanel();
+		
+		userPanel.setBackground(new Color(255,255,255,255));
+		
+		JPanel gridBagidInfo = new JPanel(new GridBagLayout());
+		gridBagidInfo.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
+		GridBagConstraints c = new GridBagConstraints();
+		
+		gridBagidInfo.setBackground(new Color(255,255,255,255));
+		
+		JLabel idLabel = new JLabel(" ID : ");
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 0;
+		gridBagidInfo.add(idLabel, c);
+
+		idTextField = new JTextField(15);
+		c.insets = new Insets(0, 5, 0, 0);
+		c.gridx = 1;
+		c.gridy = 0;
+		gridBagidInfo.add(idTextField, c);
+
+		JLabel passLabel = new JLabel(" PassWord : ");
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 1;
+		c.insets = new Insets(20, 0, 0, 0);
+		gridBagidInfo.add(passLabel, c);
+		
+		passTextField = new JPasswordField(15);
+		c.insets = new Insets(20, 5, 0, 0);
+		c.gridx = 1;
+		c.gridy = 1;
+		gridBagidInfo.add(passTextField, c);
+
+		JPanel loginPanel = new JPanel();
+
+		JButton loginButton = new JButton("login");
+		loginButton.setPreferredSize(new Dimension(130,30));
+		loginButton.setForeground(new Color(255,255,255));
+		loginButton.setBackground(new Color (29,161,243));
+		
+		loginPanel.setPreferredSize(new Dimension(200,200));
+		
+		loginPanel.add(loginButton);	
+		loginPanel.setBackground(new Color(255,255,255,255));
+		
+		JPanel signupPanel = new JPanel();
+		JButton signupButton = new JButton("Sign Up");
+		
+		signupPanel.setBackground(new Color(255,255,255,255));
+		signupPanel.setPreferredSize(new Dimension(200,200));
+		signupButton.setForeground(new Color(29,161,243));
+		signupButton.setBackground(new Color (255,255,255));
+		
+		signupButton.setPreferredSize(new Dimension(130,30));
+		
+		loginPanel.add(signupButton);
+		
+		
+		JPanel ChangePasswordPanel = new JPanel();
+		JButton ChangePasswordButton = new JButton("Change Password");
+		
+		signupPanel.setBackground(new Color(255,255,255,255));
+		signupPanel.setPreferredSize(new Dimension(200,200));
+		ChangePasswordButton.setForeground(new Color(29,161,243));
+		ChangePasswordButton.setBackground(new Color (255,255,255));
+		
+		ChangePasswordButton.setPreferredSize(new Dimension(130,30));
+		
+		loginPanel.add(ChangePasswordButton);
+		
+		mainPanel.add(centerPanel);
+		mainPanel.add(userPanel);
+		mainPanel.add(gridBagidInfo);
+		mainPanel.add(loginPanel);
+		mainPanel.add(signupPanel);
+		
+		
+		
+		loginButton.addActionListener(this);
+
+		signupButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				lp.card.next(lp.cardPanel);
+			}
+		});
+		
+		ChangePasswordButton.addActionListener(this);
+		
+		ChangePasswordButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				lp.card.last(lp.cardPanel);
+			}
+		});
+		
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		JButton jb = (JButton) e.getSource();
+
+		switch (e.getActionCommand()) {
+
+		case "normal":
+			userMode = "normal";
+			break;
+
+		case "login":
+
+			String id = idTextField.getText();
+			String pass = passTextField.getText();
+
+			try {
+
+				String sql_query = String.format("SELECT password FROM USER WHERE id = '%s' AND password ='%s'",id, pass);
+
+				Connection conn = lp.getConnection();
+				Statement stmt = conn.createStatement();
+
+				ResultSet rset = stmt.executeQuery(sql_query);
+				rset.next();
+
+				if (pass.equals(rset.getString(1))) {
+					JOptionPane.showMessageDialog(this, "Login Success", "Login Success", 1);
+					LoginProject.jf.setVisible(false);
+					Main frame = new Main(id);
+					frame.setVisible(true);
+
+				} else
+					JOptionPane.showMessageDialog(this, "Login Failed", "Login Failed", 1);
+
+			} catch (SQLException ex) {
+				JOptionPane.showMessageDialog(this, "Login Failed", "Login Failed", 1);
+				System.out.println("SQLException" + ex);
+			}
+			break;
+
+		}
+	}
+
+} // class LoginPanel
+
+class signupPanel extends JPanel {
+
+	JTextField idTf;
+	JPasswordField passTf;
+	JPasswordField passReTf;
+	JTextField nameTf;	
+	JPanel mainPanel;
+	JPanel subPanel;
+	
+	JButton SignUpButton;
+	Font font = new Font("Sign Up", Font.BOLD, 40);
+
+	String id = "", pass = "", passRe = "", name = "";
+	
+	LoginProject lp;
+	
+	public signupPanel(LoginProject lp) {
+		this.lp = lp;
+		subPanel = new JPanel();
+		subPanel.setLayout(new GridBagLayout());
+		subPanel.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
+		subPanel.setBackground(new Color(255,255,255,255));;
+		
+		JLabel idLabel = new JLabel("ID : ");
+		JLabel passLabel = new JLabel("PassWord : ");
+		JLabel passReLabel = new JLabel("PassWord reconfirm : ");
+		JLabel nameLabel = new JLabel("Name : ");
+		
+		idTf = new JTextField(15);
+		passTf = new JPasswordField(15);
+		passReTf = new JPasswordField(15);
+		nameTf = new JTextField(15);
+
+		GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.insets = new Insets(15, 15, 0, 0); // 
+
+		c.gridx = 0;
+		c.gridy = 0;
+		subPanel.add(idLabel, c);
+		
+		c.gridx = 1;
+		c.gridy = 0;
+		subPanel.add(idTf, c); // id
+
+		c.gridx = 0;
+		c.gridy = 1;
+		subPanel.add(passLabel, c);
+
+		c.gridx = 1;
+		c.gridy = 1;
+		subPanel.add(passTf, c); // pass
+		
+		c.gridx = 2;
+		c.gridy = 1; 
+		
+		c.gridx = 0;
+		c.gridy = 2;
+		subPanel.add(passReLabel, c);
+		
+		
+		c.gridx = 1;
+		c.gridy = 2;
+		subPanel.add(passReTf, c);
+		
+		
+		c.gridx = 0;
+		c.gridy = 3;
+		subPanel.add(nameLabel, c);
+
+		c.gridx = 1;
+		c.gridy = 3;
+		subPanel.add(nameTf, c);
+		
+		
+		mainPanel = new JPanel();
+		mainPanel.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
+		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+		
+		mainPanel.setBackground(new Color(255,255,255,255));
+		
+		JLabel signupLabel = new JLabel("Sign Up Page ");
+		signupLabel.setFont(font);
+		signupLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+		SignUpButton = new JButton("Sign Up");
+
+		SignUpButton.setForeground(new Color(29,161,243));
+		SignUpButton.setBackground(new Color (255,255,255));
+		
+		JButton backButton = new JButton("Back");
+		
+		backButton.setForeground(new Color(29,161,243));
+		backButton.setBackground(new Color (255,255,255));
+		
+		mainPanel.add(signupLabel);
+		mainPanel.add(subPanel);
+		mainPanel.add(SignUpButton);
+		mainPanel.add(backButton);
+		
+		backButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				lp.card.first(lp.cardPanel);
+			}
+		});
+		
+		
+		SignUpButton.addActionListener(new ActionListener() { //signup button		
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				id = idTf.getText();
+				pass = new String(passTf.getPassword());
+				passRe = new String(passReTf.getPassword());
+				name = nameTf.getText();
+
+				
+				String sql = "insert into USER(id, password, nickname) values (?,?,?)";
+				
+				Pattern passPattern1 = Pattern.compile(".{5,20}$"); //5~20 length password
+				Matcher passMatcher = passPattern1.matcher(pass);
+
+				if (!passMatcher.find()) {
+					JOptionPane.showMessageDialog(null, "please password length is 5 ~ 20.", "Password error", 1);
+				} else if (!pass.equals(passRe)) {
+					JOptionPane.showMessageDialog(null, "Passwords don't match", "Password error", 1);
+				} else {
+					try {
+						Connection conn = lp.getConnection();
+
+						PreparedStatement pstmt = conn.prepareStatement(sql);
+
+						pstmt.setString(1, idTf.getText());
+						pstmt.setString(2, pass);
+						pstmt.setString(3, nameTf.getText());
+						
+						int r = pstmt.executeUpdate();
+				
+						
+						JOptionPane.showMessageDialog(null, "Sign Up success!", "Sign Up", 1);
+						lp.card.previous(lp.cardPanel);
+					} catch (SQLException e1) {
+						System.out.println("SQL error" + e1.getMessage());
+						if (e1.getMessage().contains("PRIMARY")) {
+							JOptionPane.showMessageDialog(null, "Duplicate ID!", "ERROR: Duplicate id", 1);
+						} else
+							JOptionPane.showMessageDialog(null, "Please enter the information correctly!", "ERROR", 1);
+					}
+				}
+			}
+		});
+
+	}
+	
+	
+}
+
+class ChangepasswordPanel extends JPanel {
+
+	JTextField idTf;
+	JPasswordField passTf;
+	JPasswordField passReTf;
+	JTextField nameTf;	
+	JPanel mainPanel;
+	JPanel subPanel;
+
+	
+	JButton ChangeButton, backButton;
+	Font font = new Font("Change", Font.BOLD, 40);
+
+	String id = "", pass = "", passRe = "", name = "";
+	
+	LoginProject lp;
+
+	public ChangepasswordPanel(LoginProject lp) {
+
+		this.lp = lp;
+		subPanel = new JPanel();
+		subPanel.setLayout(new GridBagLayout());
+		subPanel.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
+		subPanel.setBackground(new Color(255,255,255,255));;
+		
+		JLabel idLabel = new JLabel("ID : ");
+		JLabel passLabel = new JLabel("PassWord : ");
+		
+		idTf = new JTextField(15);
+		passTf = new JPasswordField(15);
+
+		GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.insets = new Insets(15, 15, 0, 0);
+
+		c.gridx = 0;
+		c.gridy = 0;
+		subPanel.add(idLabel, c);
+		
+		c.gridx = 1;
+		c.gridy = 0;
+		subPanel.add(idTf, c); 
+
+		c.gridx = 0;
+		c.gridy = 1;
+		subPanel.add(passLabel, c);
+
+		c.gridx = 1;
+		c.gridy = 1;
+		subPanel.add(passTf, c); 
+		
+		
+		mainPanel = new JPanel();
+		mainPanel.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
+		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+		
+		mainPanel.setBackground(new Color(255,255,255,255));
+		
+		JLabel signupLabel = new JLabel("Change Password");
+		signupLabel.setFont(font);
+		signupLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+		ChangeButton = new JButton("Change");
+
+		ChangeButton.setForeground(new Color(29,161,243));
+		ChangeButton.setBackground(new Color (255,255,255));
+		
+		backButton = new JButton("Back");
+		
+		backButton.setForeground(new Color(29,161,243));
+		backButton.setBackground(new Color (255,255,255));	
+		
+		mainPanel.add(signupLabel);
+		mainPanel.add(subPanel);
+		mainPanel.add(ChangeButton);
+		mainPanel.add(backButton);
+		
+		backButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				lp.card.first(lp.cardPanel);
+			}
+		});
+		
+		
+		ChangeButton.addActionListener(new ActionListener() { //signup button
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				id = idTf.getText();
+				pass = new String(passTf.getPassword());
+				
+				String sql = String.format("update USER set password = '%s' where id = '%s'",pass,id);
+				
+				String sql_query = String.format("SELECT id FROM USER WHERE id = '%s'",id);
+				
+				Pattern passPattern1 = Pattern.compile(".{5,20}$"); //5~20 length password
+				Matcher passMatcher = passPattern1.matcher(pass);
+				
+				if (!passMatcher.find()) {
+					JOptionPane.showMessageDialog(null, "please password length is 5 ~ 20.", "Password error", 1);
+				} 
+				else
+				{
+					try {
+						Connection conn = lp.getConnection();
+
+						PreparedStatement pstmt = conn.prepareStatement(sql);
+						
+						Connection conn2 = lp.getConnection();
+						Statement stmt = conn2.createStatement();
+						ResultSet rset = stmt.executeQuery(sql_query);
+						
+						
+						int r = pstmt.executeUpdate();
+						
+						if(!rset.next()) {
+							JOptionPane.showMessageDialog(null, "Invalid id!", "Change", 1);
+						}
+						else {
+						JOptionPane.showMessageDialog(null, "Change success!", "Change", 1);
+						lp.card.first(lp.cardPanel);}
+					} catch (SQLException e1) {
+						System.out.println("SQL error" + e1.getMessage());
+					}
+				}
+			}
+		});
+
+	}
+	
+	
+	
+	
+}
+
+
+//Main
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridLayout;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Scrollbar;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.swing.*;
+import javax.swing.border.LineBorder;
+
+public class Main  extends JFrame{
+	
+	Data so = new Data();
+	String[][] postValue = so.getPost();
+	String[][] followers = so.getFollowers();
+	Container container = getContentPane();
+	JPanel p = new JPanel(); //follower瑜� �닃���쓣 �븣 follower�쓽 寃뚯떆湲�留� �몴�떆�븯湲� �쐞�븳 �뙣�꼸
+	public Main(String userID) {
+		super("Twitter");
+		setSize(650, 800);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		//湲곕낯 �뙣�꼸 �꽕�젙
+		container.setLayout(null);
+		container.setBackground(new Color(230, 255, 255));
+		
+		JPanel pnlWest = new JPanel();
+		JPanel pnlCenter = new JPanel();
+		JPanel pnlEast = new JPanel();
+		JPanel pnlNorth = new JPanel();
+		
+		pnlNorth.setBounds(0, 0, 636, 80);
+		pnlWest.setBounds(10, 100, 90, 650);
+		pnlEast.setBounds(450, 100, 180, 650);
+		pnlCenter.setBounds(120, 100, 310, 650);
+		
+		pnlNorth.setLayout(null);
+		pnlWest.setLayout(null);
+		pnlEast.setLayout(null);
+		pnlCenter.setLayout(null);
+		
+		pnlCenter.setBackground(new Color(29,161,243));
+		pnlNorth.setBackground(new Color(255, 255, 255));
+		pnlWest.setBackground(new Color(255, 255, 255));
+		pnlEast.setBackground(new Color(255, 255, 255));
+		
+		container.add(pnlNorth);
+		container.add(pnlEast);
+		container.add(pnlWest);
+		container.add(pnlCenter);
+		
+		LineBorder line = new LineBorder(new Color(85, 135, 237), 2, true);
+		LineBorder line1 = new LineBorder(new Color(85, 135, 237), 2, true);
+		LineBorder line2 = new LineBorder(new Color(85, 135, 237), 2, true);
+		LineBorder line3 = new LineBorder(new Color(0, 44, 145), 2, true);
+		pnlNorth.setBorder(line);
+		pnlEast.setBorder(line2);
+		pnlWest.setBorder(line1);
+		pnlCenter.setBorder(line3);
+		
+		//North 而댄룷�꼳�듃
+		JLabel page = new JLabel("TWITTER");
+		JTextField searchField = new JTextField();
+		RoundedButton btnSearch = new RoundedButton("SEARCH");
+		btnSearch.setBackground(Color.WHITE);
+		btnSearch.setForeground(new Color(29,161,243));
+		btnSearch.setBounds(430, 25, 60, 30);
+		btnSearch.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				String search = searchField.getText();
+				DBConnection DBcon = new DBConnection();
+				DBcon.connect();
+				String query = "select * from post where postTitle like '%" + search + "%'";
+				try {
+					Statement stmt = DBcon.connection.createStatement();
+					ResultSet result = stmt.executeQuery(query);
+					while(result.next()) {
+						System.out.println(result.getString(1));
+						System.out.println(result.getInt(2));
+						System.out.println(result.getString(3));
+						System.out.println(result.getString(4));
+						System.out.println(result.getString(5));
+						System.out.println(result.getDate(6));
+					}
+					DBcon.connection.close();
+				}catch(SQLException SQLE) {
+					SQLE.printStackTrace();
+				}
+			}
+		});
+		
+
+		searchField.setBounds(490, 25, 130, 30);
+		page.setBounds(230, 10, 120, 60);
+		page.setFont(new Font("Comic Sans MS", Font.BOLD, 20));
+		
+		pnlNorth.add(page);
+		pnlNorth.add(searchField);	
+		pnlNorth.add(btnSearch);
+		
+		//West 而댄룷�꼳�듃
+		RoundedButton home = new RoundedButton("HOME");
+		RoundedButton post = new RoundedButton("POST");
+		
+		home.setBounds(5, 10, 80, 30);
+		post.setBounds(5, 50, 80, 30);
+		post.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dia subFrame = new dia(userID);
+				subFrame.diaFrame.setVisible(true);
+			}
+		});
+		
+		home.setBackground(new Color(29,161,243));
+		post.setBackground(new Color(29,161,243));
+		home.setForeground(Color.WHITE);
+		post.setForeground(Color.WHITE);
+		
+		home.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				pnlCenter.setVisible(true);
+				
+			}
+		});
+		
+		pnlWest.add(home);
+		pnlWest.add(post);
+		
+		
+		//East 而댄룷�꼳�듃
+		int j = 0;
+		
+		while(followers[j][0]!=null) {
+			
+			if(followers[j][0].equals(userID)) {
+				
+				RoundedButton follower = new RoundedButton();
+				follower.setText(followers[j][1]);
+				follower.setBounds(50, 20+40*j, 80, 30);
+				follower.setBackground(Color.WHITE);
+				follower.setForeground(new Color(29,161,243));
+				follower.addActionListener(new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						pnlCenter.setVisible(false);
+						
+						p.removeAll();
+						
+						LineBorder line4 = new LineBorder(new Color(0, 44, 145), 2, true);
+						p.setBorder(line4);
+						p.setLayout(null);
+						p.setBounds(120, 100, 310, 650);
+						p.setBackground(new Color(29,161,243));
+						
+						int i = 0;
+						int postLoc = 0;
+						//寃뚯떆湲� �몴�떆
+						while(postValue[i][0]!=null) {
+							
+							if(follower.getText().equals(postValue[i][1])) {
+								
+								RoundedButton btnPost = new RoundedButton();
+								btnPost.setBackground(Color.WHITE);
+								btnPost.setText(postValue[i][0]);
+								btnPost.setBounds(2, 2+(postLoc*120), 306, 100);
+								btnPost.setFont(new Font("Comic Sans MS", Font.BOLD, 20));
+								p.add(btnPost);
+								postLoc += 1;
+								
+							}
+							
+							i += 1;
+							
+						}
+						
+						container.add(p);
+						
+					}
+				});
+				
+				pnlEast.add(follower);
+				
+			}
+				j += 1;
+				
+			}
+			
+		//Center 而댄룷�꼳�듃
+		int i = 0;
+		//寃뚯떆湲� �몴�떆
+		while(postValue[i][0]!=null) {
+				
+			RoundedButton btnPost = new RoundedButton();
+			btnPost.setBackground(Color.WHITE);
+			btnPost.setText(postValue[i][0]);
+			btnPost.setBounds(2, 2+(i*120), 306, 100);
+			btnPost.setFont(new Font("Comic Sans MS", Font.BOLD, 20));
+			btnPost.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					int i = 0;
+					while(postValue[i][0]!=null) {
+						
+						if(btnPost.getText().equals(postValue[i][0])) {
+							PostWindow pw = new PostWindow(userID, postValue[i][1], postValue[i][2], postValue[i][0]);
+						}
+						i += 1;
+					}
+				}
+			});
+			pnlCenter.add(btnPost);
+			i += 1;
+				
+		}
+	}
+	
+}
+
+// �뫁洹쇳뀒�몢由� 踰꾪듉�쓣 留뚮뱾湲� �쐞�븳 class
+class RoundedButton extends JButton {
+
+    public RoundedButton() {
+        super();
+        decorate();
+    }
+
+    public RoundedButton(String text) {
+        super(text);
+        decorate();
+    }
+
+    public RoundedButton(Action action) {
+        super(action);
+        decorate();
+    }
+
+    public RoundedButton(Icon icon) {
+        super(icon);
+        decorate();
+    }
+
+    public RoundedButton(String text, Icon icon) {
+        super(text, icon);
+        decorate();
+    }
+
+    protected void decorate() {
+        setBorderPainted(false);
+        setOpaque(false);
+    }
+    
+    @Override
+    protected void paintComponent(Graphics g) {
+        int width = getWidth();
+        int height = getHeight();
+
+        Graphics2D graphics = (Graphics2D) g;
+
+        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        if (getModel().isArmed()) {
+            graphics.setColor(getBackground().darker());
+        } else if (getModel().isRollover()) {
+            graphics.setColor(getBackground().brighter());
+        } else {
+            graphics.setColor(getBackground());
+        }
+
+        graphics.fillRoundRect(0, 0, width, height, 10, 10);
+
+        FontMetrics fontMetrics = graphics.getFontMetrics();
+        Rectangle stringBounds = fontMetrics.getStringBounds(this.getText(), graphics).getBounds();
+
+        int textX = (width - stringBounds.width) / 2;
+        int textY = (height - stringBounds.height) / 2 + fontMetrics.getAscent();
+
+        graphics.setColor(getForeground());
+        graphics.setFont(getFont());
+        graphics.drawString(getText(), textX, textY);
+        graphics.dispose();
+
+        super.paintComponent(g);
+    }
+    
+}
+
+//database�� �뿰�룞�븯�뒗 class
+class Data {
+
+	   Connection con;
+	   Statement stmt;
+	   
+	   Data() {
+		   //�뿰寃고븯�젮�뒗 db�젙蹂�
+	     String url="jdbc:mysql://localhost:3306/twitter"; 
+	     String userid="twitter";
+	     String pwd="gachon";
+	  
+	     try { 	
+	    	 //�뿰寃곗떎�뻾
+	       con=DriverManager.getConnection(url, userid, pwd);
+	       System.out.println("MySQL connection\n");
+	     } catch(SQLException e) {
+	         e.printStackTrace();
+	       }	     
+	   }
+
+	   //post table�뿉�꽌 posttitle, id 媛��졇�샂
+	   public String[][] getPost() {
+		   	String query="SELECT postTitle, id, post FROM post";
+		   	String[][] postValues=new String[50][3];
+		   	
+		  	try { 
+				  	 stmt=con.createStatement();
+			  	     ResultSet rs=stmt.executeQuery(query);
+			  	     int i=0;
+			  	     
+			  	     while(rs.next()) {
+			  	    	
+			  	    	postValues[i][0] = rs.getString(1);
+			  	    	postValues[i][1] = rs.getString(2);
+			  	    	postValues[i][2] = rs.getString(3);
+				  	    System.out.println(postValues[i][0] + ' ' + postValues[i][1] + ' ' + postValues[i][2]);
+				  	    i+=1;
+				  	    
+			  	     }
+				    
+			  	     rs.close();
+			  	     
+			 } catch(SQLException e) {
+			  	  	 e.printStackTrace();
+			   }
+		     	
+		  	return postValues;
+		  }
+
+	   
+	   //follower�젙蹂� 媛��졇�샂
+	   public String[][] getFollowers() {
+		   String query = "SELECT ID, Friend_ID FROM follower";
+		   String[][] followers = new String[20][2];
+		   
+		   try {
+			   
+			   stmt = con.createStatement();
+			   ResultSet rs = stmt.executeQuery(query);
+			   int i = 0;
+			   
+			   while(rs.next()) {
+				   
+				   followers[i][0] = rs.getString(1);
+				   followers[i][1] = rs.getString(2);
+				   System.out.println(followers[i]);
+				   i += 1;
+				   
+			   }
+			   
+			   rs.close();
+			   
+				  }
+		   catch(SQLException e) {
+			   e.printStackTrace();
+		   }
+		   
+		   return followers;
+	   }
+	}
+
+// class MainUI{	
+//	
+//	public static void main(String[] args) {
+//		// TODO Auto-generated method stub
+//		MainUI frame = new MainUI();
+//		frame.setVisible(true);
+//	}
+//
+//}
+
+//PostWindow
+
+import java.awt.EventQueue;
+import javax.swing.JFrame;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+
+import javax.swing.JToolBar;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextArea;
+import javax.swing.JComboBox;
+import javax.swing.JTextPane;
+import javax.swing.JSeparator;
+import javax.swing.JOptionPane;
+import javax.swing.JList;
+import javax.swing.JDialog;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.JScrollPane;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.border.LineBorder;
+import com.sun.tools.javac.Main;
+import javax.swing.JFormattedTextField;
+import java.sql.*;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+
+public class PostWindow extends JFrame{
+
+	public JPanel postPanel;
+	private JTextField likeNum;
+	private JTextField searchTextArea;
+	private JTextField idTextArea;
+	Data so = new Data();
+	String[][] postValue = so.getPost();
+	String[][] followers = so.getFollowers();
+	Container container = getContentPane();
+	
+	JPanel p = new JPanel(); //follower瑜� �닃���쓣 �븣 follower�쓽 寃뚯떆湲�留� �몴�떆�븯湲� �쐞�븳 �뙣�꼸
+
+	/**
+	 * Create the application.
+	 */
+	public PostWindow(String myId, String id, String post, String post_title) {
+		super("Twitter");
+		setSize(650, 800);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setVisible(true);
+		initialize(myId, id, post, post_title);
+		
+	}
+
+	/**
+	 * Initialize the contents of the postFrame.
+	 */
+	// 濡쒓렇�씤 --> mainUI --> post源뚯� �쟾�떖�릺�뼱�빞�븷 myId,
+	// mainUI 寃뚯떆臾쇰쭏�떎 ���옣�릺�뼱 �엳�뒗 寃뚯떆�옄�쓽 id, post, post_title �젙蹂� 媛��졇�삤湲�
+	// 洹쇰뜲 id, post, postTile �꼫臾� 蹂듭옟�빐�꽌 post留덈떎 援щ텇�븷 �닔 �엳�뒗 postNum �엳�뒗寃� �굹�쓣 寃� 媛숈쓬...
+	private void initialize(String myId, String id, String post, String post_title) {
+		// 媛��졇�삱 �슂�냼 珥덇린�솕
+		String postTitle = null;
+		String postContent = null;
+		String postComment = null;
+		int postlike = 0;
+		
+		// DB connection
+		DBConnection DBcon = new DBConnection();
+		DBcon.connect();
+		
+		// 寃뚯떆臾� �꽑�깮�븷 �븣�쓽 id, post�궡�슜, postTitle �젙蹂댁� 媛숈� �뻾�뱾�쓣 select.
+		String postQuery = String.format("select * from post where id = '%s' and post = '%s' and postTitle = '%s';", id, post, post_title);
+		try{
+			Statement poststmt = DBcon.connection.createStatement();
+			ResultSet postResult = poststmt.executeQuery(postQuery);
+			while (postResult.next()) {
+				postTitle = postResult.getString("postTitle");
+				postContent = postResult.getString("post");
+				postlike = postResult.getInt("likeNum");
+				postComment = postResult.getString("comments");
+			}
+			DBcon.connection.close();
+		}catch(SQLException SQLE) {
+			SQLE.printStackTrace();
+		}
+		
+	    String heart = new String(Character.toChars(10084));
+	    String msg = heart;
+	    
+		
+		//湲곕낯 �뙣�꼸 �꽕�젙
+		container.setLayout(null);
+		container.setBackground(new Color(230, 255, 255));
+		
+		JPanel pnlWest = new JPanel();
+		JPanel postPanel = new JPanel();
+		JPanel pnlEast = new JPanel();
+		JPanel pnlNorth = new JPanel();
+		
+		pnlNorth.setBounds(0, 0, 636, 80);
+		pnlWest.setBounds(10, 100, 90, 650);
+		pnlEast.setBounds(450, 100, 180, 650);
+		postPanel.setBounds(120, 100, 310, 650);
+		
+		pnlNorth.setLayout(null);
+		pnlWest.setLayout(null);
+		pnlEast.setLayout(null);
+		postPanel.setLayout(null);
+		
+		postPanel.setBackground(new Color(29,161,243));
+		pnlNorth.setBackground(new Color(255, 255, 255));
+		pnlWest.setBackground(new Color(255, 255, 255));
+		pnlEast.setBackground(new Color(255, 255, 255));
+		
+		container.add(pnlNorth);
+		container.add(pnlEast);
+		container.add(pnlWest);
+		container.add(postPanel);
+		
+		LineBorder line = new LineBorder(new Color(85, 135, 237), 2, true);
+		LineBorder line1 = new LineBorder(new Color(85, 135, 237), 2, true);
+		LineBorder line2 = new LineBorder(new Color(85, 135, 237), 2, true);
+		LineBorder line3 = new LineBorder(new Color(0, 44, 145), 2, true);
+		pnlNorth.setBorder(line);
+		pnlEast.setBorder(line2);
+		pnlWest.setBorder(line1);
+		postPanel.setBorder(line3);
+		
+		//North 而댄룷�꼳�듃
+		JLabel page = new JLabel("TWITTER");
+		JTextField searchField = new JTextField();
+		RoundedButton btnSearch = new RoundedButton("SEARCH");
+		btnSearch.setBackground(Color.WHITE);
+		btnSearch.setForeground(new Color(29,161,243));
+		btnSearch.setBounds(430, 25, 60, 30);
+		btnSearch.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				String search = searchField.getText();
+				DBConnection DBcon = new DBConnection();
+				DBcon.connect();
+				String query = "select * from post where postTitle like '%" + search + "%'";
+				try {
+					Statement stmt = DBcon.connection.createStatement();
+					ResultSet result = stmt.executeQuery(query);
+					while(result.next()) {
+						System.out.println(result.getString("id"));
+						System.out.println(result.getInt("likeNum"));
+						System.out.println(result.getString("comments"));
+						System.out.println(result.getString("post"));
+						System.out.println(result.getString("postTitle"));
+						System.out.println(result.getString("postTime"));
+					}
+					DBcon.connection.close();
+				}catch(SQLException SQLE) {
+					SQLE.printStackTrace();
+				}
+			}
+		});
+
+		searchField.setBounds(490, 25, 130, 30);
+		page.setBounds(230, 10, 120, 60);
+		page.setFont(new Font("Comic Sans MS", Font.BOLD, 20));
+		
+		pnlNorth.add(page);
+		pnlNorth.add(searchField);	
+		pnlNorth.add(btnSearch);
+		
+		//West 而댄룷�꼳�듃
+		RoundedButton home = new RoundedButton("HOME");
+		RoundedButton postbtn = new RoundedButton("POST");
+		
+		home.setBounds(5, 10, 80, 30);
+		postbtn.setBounds(5, 50, 80, 30);
+		postbtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dia subFrame = new dia(myId);
+				subFrame.diaFrame.setVisible(true);
+			}
+		});
+		
+		home.setBackground(new Color(29,161,243));
+		postbtn.setBackground(new Color(29,161,243));
+		home.setForeground(Color.WHITE);
+		postbtn.setForeground(Color.WHITE);
+		
+		home.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				setVisible(false);
+			}
+		});
+		
+		pnlWest.add(home);
+		pnlWest.add(postbtn);
+		
+		//East 而댄룷�꼳�듃
+		int j = 0;
+		
+		while(followers[j][0]!=null) {
+			
+			if(followers[j][0].equals(myId)) {
+				
+				RoundedButton follower = new RoundedButton();
+				follower.setText(followers[j][1]);
+				follower.setBounds(50, 20+40*j, 80, 30);
+				follower.setBackground(Color.WHITE);
+				follower.setForeground(new Color(29,161,243));
+				follower.addActionListener(new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						postPanel.setVisible(false);
+						
+						p.removeAll();
+						
+						LineBorder line4 = new LineBorder(new Color(0, 44, 145), 2, true);
+						p.setBorder(line4);
+						p.setLayout(null);
+						p.setBounds(120, 100, 310, 650);
+						p.setBackground(new Color(29,161,243));
+						
+						int i = 0;
+						int postLoc = 0;
+						//寃뚯떆湲� �몴�떆
+						while(postValue[i][0]!=null) {
+							
+							if(follower.getText().equals(postValue[i][1])) {
+								
+								RoundedButton btnPost = new RoundedButton();
+								btnPost.setBackground(Color.WHITE);
+								btnPost.setText(postValue[i][0]);
+								btnPost.setBounds(2, 2+(postLoc*120), 306, 100);
+								btnPost.setFont(new Font("Comic Sans MS", Font.BOLD, 20));
+								p.add(btnPost);
+								postLoc += 1;
+								
+							}
+							
+							i += 1;
+							
+						}
+						
+						container.add(p);
+						
+					}
+				});
+				
+				pnlEast.add(follower);
+				
+			}
+				j += 1;
+				
+//			}
+//		postFrame = new JFrame();
+//		postFrame.setBounds(0, 0, 900, 700);
+//		postFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		postFrame.getContentPane().setLayout(null);
+//		
+//		
+//	    JPanel postPanel = new JPanel();
+//	    postPanel.setBounds(120, 100, 310, 650);
+//	    postPanel.setBackground(new Color(29,161,243));
+//	    LineBorder line3 = new LineBorder(new Color(0, 44, 145), 2, true);
+//	    postPanel.setBorder(line3);
+//		postPanel.setLayout(null);
+		
+		// post �궡�슜遺�遺�
+		JTextArea postTextArea = new JTextArea(100, 100);
+		postTextArea.setBounds(0, 52, 500, 200);
+		postTextArea.setWrapStyleWord(true);
+		postTextArea.setText(postContent);
+		postTextArea.setFont(new Font("Comic Sans MS", Font.BOLD, 13));
+		postTextArea.setEditable(false);
+		postPanel.add(postTextArea);
+		
+		// �뙎湲�
+		JTextArea commentsTextArea = new JTextArea();
+		
+		JScrollPane commentsScrollPane = new JScrollPane(commentsTextArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		commentsScrollPane.setBounds(0, 294, 500, 305);
+		postPanel.add(commentsScrollPane);
+		commentsScrollPane.setViewportView(commentsTextArea);
+		commentsTextArea.setText(postComment);
+		commentsTextArea.setFont(new Font("Comic Sans MS", Font.BOLD, 20));
+		commentsTextArea.setEditable(false);
+		
+		// 寃뚯떆臾� �쐞�뿉 �늻媛� �삱�졇�뒗吏��뿉 ���븳 �젙蹂�...
+		ImageIcon img = new ImageIcon("./src/user.png");
+		JPanel profilePanel = new JPanel();
+		profilePanel.setBounds(0, 0, 500, 53);
+		postPanel.add(profilePanel);
+		profilePanel.setLayout(null);
+		
+		// 湲곕낯 �봽濡쒗븘 �씠誘몄� 踰꾪듉�쑝濡� �떖�뼱�넃�� 寃�
+		JButton ImageButton = new JButton(img);
+		ImageButton.setHorizontalAlignment(SwingConstants.LEFT);
+		ImageButton.setBounds(0, 0, 100, 53);
+		ImageButton.setBorderPainted(false);
+		ImageButton.setContentAreaFilled(false);
+		ImageButton.setFocusPainted(false);
+		profilePanel.setBackground(new Color(29,161,243));
+		profilePanel.add(ImageButton);
+		
+		// 寃뚯떆臾� �늻媛� �삱�졇�뒗吏�
+		idTextArea = new JTextField();
+		idTextArea.setBounds(109, 10, 100, 33);
+		profilePanel.add(idTextArea);
+		idTextArea.setColumns(10);
+		idTextArea.setFont(new Font("Comic Sans MS", Font.BOLD, 13));
+		idTextArea.setText(id);
+		
+		// follow 踰꾪듉
+		JButton followButton = new JButton("+");
+		followButton.setHorizontalAlignment(SwingConstants.LEFT);
+		followButton.setFont(new Font("援대┝", Font.BOLD, 18));
+		followButton.setBorderPainted(false);
+		followButton.setContentAreaFilled(false);
+		followButton.setFocusPainted(false);
+		followButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (myId != id) {
+					DBConnection DBcon = new DBConnection();
+					DBcon.connect();
+					String follow = String.format("insert into follower values('%s', '%s');" , myId, id);
+					try{
+						Statement followstmt = DBcon.connection.createStatement();
+						followstmt.executeUpdate(follow);
+						DBcon.connection.close();
+						JOptionPane.showMessageDialog(container, "移쒓뎄異붽� �릺�뿀�뒿�땲�떎!");
+					}catch(SQLException SQLE) {
+						SQLE.printStackTrace();
+					}
+				}
+				
+			}
+		});
+		followButton.setBounds(212, 14, 53, 23);
+		profilePanel.add(followButton);
+		
+		// 醫뗭븘�슂踰꾪듉 �넃�쓣 �옄由�
+		JPanel etcPanel = new JPanel();
+		etcPanel.setBounds(0, 252, 500, 43);
+		postPanel.add(etcPanel);
+		etcPanel.setLayout(null);
+		
+		likeNum = new JTextField();
+		likeNum.setBounds(64, 11, 56, 21);
+		etcPanel.add(likeNum);
+		likeNum.setColumns(10);
+		likeNum.setText(String.valueOf(postlike));
+		
+		// 醫뗭븘�슂 踰꾪듉�쓣 �늻瑜대㈃ �떎�떆媛꾩쑝濡� 利앷��릺寃�
+		JButton likeButton = new JButton(msg);
+		likeButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				DBConnection DBcon = new DBConnection();
+				DBcon.connect();
+				String query = String.format("update post set likeNum = likeNum + 1 where id ='%s' and post = '%s' and postTitle = '%s';", id, post, post_title);
+				String likeNumquery = String.format("select likeNum from post where id = '%s' and post = '%s' and postTitle = '%s';", id, post, post_title);
+				try {
+					Statement stmt = DBcon.connection.createStatement();
+					stmt.executeUpdate(query);
+					ResultSet likeResult = stmt.executeQuery(likeNumquery);
+					likeResult.next();
+					likeNum.setText(likeResult.getString("likeNum"));
+					DBcon.connection.close();
+				}catch(SQLException SQLE) {
+					SQLE.printStackTrace();
+				}
+			}
+		});
+		likeButton.setBounds(12, 10, 56, 23);
+		etcPanel.add(likeButton);
+	}
+}
+}
+
+// db connection�븯�뒗 遺�遺�
+// local�뿉�꽌 �븷�븣�뒗 �옄湲� db�뿉 留욊쾶 �빐以섏빞�옒
+class DBConnection{
+	Connection connection;
+	
+	public void connect() {
+		String url = "jdbc:mysql://localhost:3306/twitter";
+		String user = "twitter";
+		String password = "gachon";
+		
+		try {
+			connection = DriverManager.getConnection(url, user, password); 
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}
+	}
+}
